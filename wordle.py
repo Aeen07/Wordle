@@ -21,24 +21,22 @@ ctk.set_default_color_theme("dark-blue")
 global letter_pos, current_line, answer_text, is_deleted, is_enter
 letter_pos = 1
 current_line = 1
-answer_text = []
-is_deleted = False
+answer_text = ''
 is_enter = False
 
 def keyboard_func(text):
     global letter_pos,current_line, answer_text, is_enter, is_deleted
     if is_enter == False:
-        if letter_pos <= 5 or is_deleted:
+        if letter_pos <= 5:
             buttons_dict[current_line][letter_pos].config(text = text, highlightbackground = '#878a8c')
-            answer_text.append(text.lower())
+            answer_text += text.lower()
             letter_pos += 1
-            is_deleted = False
         else:
             print('not enough letters!')
     else:
-        answer_text = []
+        answer_text = ''
         buttons_dict[current_line][letter_pos].config(text = text, highlightbackground = '#878a8c')
-        answer_text.append(text.lower())
+        answer_text += text.lower()
         letter_pos += 1
         is_enter = False
 
@@ -49,19 +47,19 @@ def enter():
     else: 
         print(answer_text)
         letters_correctly = ''
-        if (''.join(answer_text).lower() in all_words):
+        if answer_text in all_words:
             for i, letter in enumerate(answer_text):
                 if letter == random_word[i]:
                     buttons_dict[current_line][i + 1].config(bg = '#6aaa64', fg = 'white', highlightthickness = 0)
-                    globals()[f"btn{letter.upper()}"].configure(fg_color = '#6aaa64', text_color = 'white', hover_color = '#6aaa64')
+                    keyboards_dict[letter.upper()].configure(fg_color = '#6aaa64', text_color = 'white', hover_color = '#6aaa64')
                     letters_correctly += random_word[i]
                 elif letter in random_word and letter not in letters_correctly:
                     buttons_dict[current_line][i + 1].config(bg = '#c9b458', fg = 'white', highlightthickness = 0)
-                    globals()[f"btn{letter.upper()}"].configure(fg_color = '#c9b458', text_color = 'white', hover_color = '#c9b458')
+                    keyboards_dict[letter.upper()].configure(fg_color = '#c9b458', text_color = 'white', hover_color = '#c9b458')
                 else:
                     buttons_dict[current_line][i + 1].config(bg = '#787c7e', fg = 'white', highlightthickness = 0)
-                    globals()[f"btn{letter.upper()}"].configure(fg_color = '#787c7e', text_color = 'white', hover_color = '#787c7e')
-            if ''.join(answer_text) == random_word :
+                    keyboards_dict[letter.upper()].configure(fg_color = '#787c7e', text_color = 'white', hover_color = '#787c7e')
+            if answer_text == random_word :
                 popup_gg.place(x = 728, y = 125)
                 t1 = threading.Thread(target=delay_close, args=(popup_gg,))
                 t1.start()
@@ -79,8 +77,11 @@ def enter():
 def delay_close(item):
     time.sleep(2)
     item.place_forget()
-    os.execl(sys.executable, sys.executable, * sys.argv)
+    if item.cget('text') == 'Great' : kill_app()
     return
+
+def kill_app():
+    os.execl(sys.executable, sys.executable, * sys.argv)
 
 def random_choose():
     with open('wordle/wordle_words.txt') as f:
@@ -91,13 +92,12 @@ random_word, all_words = random_choose()
 print(random_word)
 
 def delete_word():
-    global is_deleted, letter_pos, current_line
+    global letter_pos, current_line, answer_text
     if letter_pos > 1:
-        answer_text.pop()
+        answer_text = answer_text[:-1]
         letter_pos -= 1
-        is_deleted = True
         buttons_dict[current_line][letter_pos].config(text = '', highlightbackground = '#d3d6da')
-        print(letter_pos)
+        
 
 root.columnconfigure((0,1,2), weight=1, uniform ='x')
 root.rowconfigure(0, weight=1, uniform='x')
@@ -124,71 +124,44 @@ frame3.pack(fill = 'both', expand = True)
 #frame1
 frame1.columnconfigure((0,1,2,3,4,5,6,7,8,9), weight= 1, uniform='b')
 frame1.rowconfigure(0, weight=1, uniform='b')
-btnQ = ctk.CTkButton(frame1, text='Q', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('Q'))
-btnW = ctk.CTkButton(frame1, text='W', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('W'))
-btnE = ctk.CTkButton(frame1, text='E', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('E'))
-btnR = ctk.CTkButton(frame1, text='R', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('R'))
-btnT = ctk.CTkButton(frame1, text='T', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('T'))
-btnY = ctk.CTkButton(frame1, text='Y', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('Y'))
-btnU = ctk.CTkButton(frame1, text='U', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('U'))
-btnI = ctk.CTkButton(frame1, text='I', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('I'))
-btnO = ctk.CTkButton(frame1, text='O', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('O'))
-btnP = ctk.CTkButton(frame1, text='P', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('P'))
-btnQ.grid(row = 0, column = 0)
-btnW.grid(row = 0, column = 1)
-btnE.grid(row = 0, column = 2)
-btnR.grid(row = 0, column = 3)
-btnT.grid(row = 0, column = 4)
-btnY.grid(row = 0, column = 5)
-btnU.grid(row = 0, column = 6)
-btnI.grid(row = 0, column = 7)
-btnO.grid(row = 0, column = 8)
-btnP.grid(row = 0, column = 9)
+keyboards_dict = defaultdict(dict)
+
+global ascii_chars
+ascii_chars = 'QWERTYUIOPASDFGHJKLZXCVBNM'
+for c in range (10):
+    curr_btn = ctk.CTkButton(frame1, text= ascii_chars[c], height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func(ascii_chars[c]))
+    curr_btn.grid(row = 0, column = c)
+    keyboards_dict[ascii_chars[c]] = curr_btn
+
+
 
 #frame2
 frame2.columnconfigure((0,1,2,3,4,5,6,7,8), weight= 1, uniform='c')
 frame2.rowconfigure(0, weight=1, uniform='c')
-btnA = ctk.CTkButton(frame2, text='A', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('A'))
-btnS = ctk.CTkButton(frame2, text='S', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('S'))
-btnD = ctk.CTkButton(frame2, text='D', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('D'))
-btnF = ctk.CTkButton(frame2, text='F', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('F'))
-btnG = ctk.CTkButton(frame2, text='G', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('G'))
-btnH = ctk.CTkButton(frame2, text='H', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('H'))
-btnJ = ctk.CTkButton(frame2, text='J', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('J'))
-btnK = ctk.CTkButton(frame2, text='K', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('K'))
-btnL = ctk.CTkButton(frame2, text='L', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('L'))
-btnA.grid(row = 0, column = 0)
-btnS.grid(row = 0, column = 1)
-btnD.grid(row = 0, column = 2)
-btnF.grid(row = 0, column = 3)
-btnG.grid(row = 0, column = 4)
-btnH.grid(row = 0, column = 5)
-btnJ.grid(row = 0, column = 6)
-btnK.grid(row = 0, column = 7)
-btnL.grid(row = 0, column = 8)
+
+for c in range (10, 19):
+    curr_btn = ctk.CTkButton(frame2, text= ascii_chars[c], height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func(ascii_chars[c]))
+    curr_btn.grid(row = 0, column = c - 10)
+    keyboards_dict[ascii_chars[c]] = curr_btn
+
+
 
 #frame3
 img_backspace = ctk.CTkImage(Image.open('Image Editor/backspace2.png'))
 frame3.columnconfigure((0,1,2,3,4,5,6,7,8), weight= 1)
 frame3.rowconfigure(0, weight=1, uniform='c')
 btnENTER = ctk.CTkButton(frame3, text='ENTER', height= 58, width = 75, text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', font = ('Helvetica', 12 , 'bold'), command=enter)
-btnZ = ctk.CTkButton(frame3, text='Z', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('Z'))
-btnX = ctk.CTkButton(frame3, text='X', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('X'))
-btnC = ctk.CTkButton(frame3, text='C', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('C'))
-btnV = ctk.CTkButton(frame3, text='V', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('V'))
-btnB = ctk.CTkButton(frame3, text='B', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('B'))
-btnN = ctk.CTkButton(frame3, text='N', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('N'))
-btnM = ctk.CTkButton(frame3, text='M', height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func('M'))
+
+for c in range (19, 26):
+    curr_btn = ctk.CTkButton(frame3, text= ascii_chars[c], height= 58, width = 42, font = ('Helvetica', 20 , 'bold'), text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command = lambda : keyboard_func(ascii_chars[c]))
+    curr_btn.grid(row = 0, column = c - 18)
+    keyboards_dict[ascii_chars[c]] = curr_btn
+
 btnBACK = ctk.CTkButton(frame3, image=img_backspace,text = '', height= 58, width = 75, text_color= 'black', fg_color= '#d3d6da',hover_color='#d3d6da', command=delete_word)
 btnENTER.grid(row = 0, column = 0)
-btnZ.grid(row = 0, column = 1)
-btnX.grid(row = 0, column = 2)
-btnC.grid(row = 0, column = 3)
-btnV.grid(row = 0, column = 4)
-btnB.grid(row = 0, column = 5)
-btnN.grid(row = 0, column = 6)
-btnM.grid(row = 0, column = 7)
 btnBACK.grid(row = 0, column = 8)
+
+
 
 #answer frame
 base_frame = ctk.CTkFrame(screen_frame, fg_color='transparent')
@@ -215,7 +188,7 @@ def keyboard_to_char(e):
         delete_word()
     elif e.char == '\r':
         enter()
-    elif e.char.lower() in 'qwertyuioplkjhgfdsazxcvbnm':
+    elif e.char.isalpha:
         keyboard_func(e.char.upper())
 
 root.bind("<KeyRelease>", keyboard_to_char)
